@@ -5,7 +5,10 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+
 }
+
+
 
 model Users{
   id                String @id @default(uuid())
@@ -14,7 +17,9 @@ model Users{
   password          String
   created_at        DateTime @default(now())
   updated_at        DateTime @updatedAt
+  deleted_at        DateTime?
   TwoFactors        TwoFactors[]
+  Categories        Categories[]
 }
 
 model Sessions{
@@ -25,6 +30,7 @@ model Sessions{
   TwoFactors        TwoFactors? @relation(fields: [twofactors_id], references: [id])
   twofactors_id     String?
   updated_at        DateTime @updatedAt
+  deleted_at        DateTime?
 }
 
 model TwoFactors{
@@ -36,5 +42,33 @@ model TwoFactors{
   expiry            DateTime
   created_at        DateTime @default(now())
   updated_at        DateTime @updatedAt
+  deleted_at        DateTime
   Sessions          Sessions[]
+}
+
+model Categories{
+  id                String @id @default(uuid())
+  Users             Users? @relation(fields: [user_id], references: [id])
+  user_id           String?
+  title             String
+  description       String?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+  deleted_at        DateTime?
+  Products          Products[]
+}
+
+
+model Products{
+  id                String @id @default(uuid())
+  name              String
+  description       String
+  value             Decimal @db.Decimal(10,2)
+  image             String
+  stock             Boolean
+  categories_id     String?
+  Categories        Categories? @relation(fields: [categories_id], references: [id])
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+  deleted_at        DateTime?
 }
